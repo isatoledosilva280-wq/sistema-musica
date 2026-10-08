@@ -1,0 +1,72 @@
+const express = require("express");
+const cors = require("cors");
+const conexao = require("./db.js");
+
+const app = express();
+const PORTA = 3000;
+
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (re, res)=>{
+    res.json({mensagem: "API Sistema de musica funcionando"})
+});
+
+app.get("/artistas", (req, res) =>{
+    const sql = "SELECT * FROM artistas";
+
+    conexao.query(sql, (erro , resultado) =>{
+        if(erro){
+            return res.status(500).json({
+                erro: "Erro ao listar artistas"
+            })
+        }
+        res.status(200).json(resultado);
+    });
+});
+
+app.get("/artistas/:id", (req, res) =>{
+    const id = req.params.id;
+    const sql = `SELECT * FROM artista WHERE id = ${id}`;
+
+    conexao.query(sql, [id] ,(erro, resultado)=>{
+        if (erro){
+            return res.status(500).json({
+                erro: "Erro ao listar artistas"
+            });
+        }
+
+        if(resultado.length === 0 ){
+             return res.status(500).json({
+                erro: "Erro ao listar artistas"
+             });
+        }
+        res.status(200).json(resultados[0]);
+    });
+});
+
+app.post("/artistas", (req, res) =>{
+    const {nome, genero, pais} = req.body;
+
+    const sql = `INSERT INTO artistas (nome, genero, pais) VALUES(?, ?, ?)`;
+
+    conexao.query(sql, [nome, genero, pais] , (erro, resultado)=>{
+        if (erro){
+            return res.status(500).json({
+                erro: "Erro ao listar artistas"
+            });
+        }
+
+        res.status(201).json({
+            mengasem : "Artista cadastrado com sucesso",
+            id: resultado.insertId
+        });
+    });
+});
+
+app.delete("/artistas/:id," (req, res) =>);
+
+
+app.listen(PORTA, ()=>{
+    console.log(`Servidor rodando em http://localhost:${PORTA}`);
+});
